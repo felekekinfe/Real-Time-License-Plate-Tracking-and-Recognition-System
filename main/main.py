@@ -1,8 +1,8 @@
 from ultralytics import YOLO
 import cv2
-from sort.sort import *
+from sort import *
 import numpy as np
-from helper import get_car,read_license_plate
+from helper import get_car,read_license_plate,write_csv
 
 
 vehicle_tracker=Sort()
@@ -11,7 +11,7 @@ coco_model=YOLO('yolov8n.pt')
 license_plate_detector=YOLO('license_plate_detector.pt')
 
 #load video
-cap=cv2.VideoCapture('output/Automatic Number Plate Recognition (ANPR) _ Vehicle Number Plate Recognition (1).mp4')
+cap=cv2.VideoCapture('output/pexels-taryn-elliott-5309381 (1080p).mp4')
 result={}
 ret=True
 frame_nmr=-1
@@ -24,24 +24,31 @@ while ret:
         result[frame_nmr]={}
         #detect vehicles
         detection=coco_model(frame)[0]
+        detection.show()
+        print(f'detection {detection}')
         detections=[]
 
         for detection in detection.boxes.data.tolist():
+            print(f'detecton loop {detection}')
             x1,y1,x2,y2,score,class_id=detection
+            print(f'class id; {class_id}')
             if int(class_id) in vehicles:
                 detections.append([x1,y1,x2,y2,score])
 
         #track vehicles
         track_ids=vehicle_tracker.update(np.asarray(detections))
+        print(f'track_ids {track_ids}')
 
         #detecte license plate
         license_paltes=license_plate_detector(frame)[0]
+        license_paltes.show()
 
         for license_plate in license_paltes.boxes.data.tolist():
+            print(f'license_plate {license_plate}')
             x1,y1,x2,y2,score,car_id=license_plate
 
             #assign plate to vehicle
-            xc1,yc1,xc2,yc2=get_car(license_plate,track_ids)
+            xc1,yc1,xc2,yc2,car_id=get_car(license_plate,track_ids)
 
             #crop
             license_plate_crop=frame[int(y1):int(y2),int(x1):int(x2), :]
@@ -60,6 +67,6 @@ while ret:
                                                              'text_score':license_plate_text_score}
 
                 }
-            #write result
-
+#write result
+write_csv(result,'output/plate.csv')
     
