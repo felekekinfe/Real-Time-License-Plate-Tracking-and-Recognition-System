@@ -3,7 +3,7 @@ import cv2
 from sort import *
 import numpy as np
 from helper import get_car,read_license_plate,write_csv
-
+import pandas as pd
 
 vehicle_tracker=Sort()
 #load model
@@ -11,7 +11,7 @@ coco_model=YOLO('yolov8n.pt')
 license_plate_detector=YOLO('license_plate_detector.pt')
 
 #load video
-cap=cv2.VideoCapture('output/pexels-taryn-elliott-5309381 (1080p).mp4')
+cap=cv2.VideoCapture('output/Traffic Control CCTV.mp4')
 result={}
 ret=True
 frame_nmr=-1
@@ -24,12 +24,13 @@ while ret:
         result[frame_nmr]={}
         #detect vehicles
         detection=coco_model(frame)[0]
-        detection.show()
+        #detection.show()
         print(f'detection {detection}')
+
         detections=[]
 
         for detection in detection.boxes.data.tolist():
-            print(f'detecton loop {detection}')
+            print(f'detection loop {detection}')
             x1,y1,x2,y2,score,class_id=detection
             print(f'class id; {class_id}')
             if int(class_id) in vehicles:
@@ -40,10 +41,10 @@ while ret:
         print(f'track_ids {track_ids}')
 
         #detecte license plate
-        license_paltes=license_plate_detector(frame)[0]
-        license_paltes.show()
+        license_plates=license_plate_detector(frame)[0]
+        #license_plates.show()
 
-        for license_plate in license_paltes.boxes.data.tolist():
+        for license_plate in license_plates.boxes.data.tolist():
             print(f'license_plate {license_plate}')
             x1,y1,x2,y2,score,car_id=license_plate
 
@@ -67,6 +68,31 @@ while ret:
                                                              'text_score':license_plate_text_score}
 
                 }
+print(f'RESULT: {result}')
+data = []
+for frame, vehicles_dict in result.items():
+    for car_id, info in vehicles_dict.items():
+        car_bbox = info['car']['bbox']
+        lp_info = info['license_plates']
+        data.append({
+            'frame': int(frame),  # Convert to int for cleaner CSV
+            'car_id': float(car_id),  # Keep as float to match your keys
+            'car_x1': car_bbox[0],
+            'car_y1': car_bbox[1],
+            'car_x2': car_bbox[2],
+            'car_y2': car_bbox[3],
+            'lp_x1': lp_info['bbox'][0],
+            'lp_y1': lp_info['bbox'][1],
+            'lp_x2': lp_info['bbox'][2],
+            'lp_y2': lp_info['bbox'][3],
+            'lp_text': lp_info['text'],
+            'lp_bbox_score': lp_info['bbox_score'],
+            'lp_text_score': lp_info['text_score']
+        })
+
+# Create a DataFrame and save to CSV
+df = pd.DataFrame(data)
+df.to_csv('output/plate.csv', index=False)
 #write result
-write_csv(result,'output/plate.csv')
+#write_csv(result,'output/plate.csv')
     
