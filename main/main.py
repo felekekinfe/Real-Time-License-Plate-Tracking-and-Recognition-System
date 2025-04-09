@@ -12,7 +12,7 @@ coco_model = YOLO('model/yolov8n.pt')
 license_plate_detector = YOLO('model/license_plate_detector.pt')
 
 # Load video
-cap = cv2.VideoCapture('output/Screenshot 2025-04-04 at 00-22-04 Every Type of Car How MotorTrend Groups Vehicle Models and Body Styles.png')
+cap = cv2.VideoCapture('ggg.jpeg')
 result = {}
 ret = True
 frame_nmr = -1
