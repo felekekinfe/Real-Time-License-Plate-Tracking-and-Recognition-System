@@ -12,21 +12,21 @@ coco_model = YOLO('model/yolov8n.pt')
 license_plate_detector = YOLO('model/license_plate_detector.pt')
 
 # Load video
-cap = cv2.VideoCapture('output/pexels-taryn-elliott-5309381 (1080p).mp4')
+cap = cv2.VideoCapture('output/Screenshot 2025-04-04 at 00-22-04 Every Type of Car How MotorTrend Groups Vehicle Models and Body Styles.png')
 result = {}
 ret = True
 frame_nmr = -1
 vehicles = [2, 3, 5, 7]  # COCO classes: car (2), motorcycle (3), bus (5), truck (7)
 
 while ret:
-    #frame_nmr += 1
+    frame_nmr += 1
     ret, frame = cap.read()
     
     if frame_nmr<10:  # Process all frames
         result[frame_nmr] = {}
         # Detect vehicles
         detection = coco_model(frame)[0]
-        #detection.show()  # Uncomment to visualize
+        detection.show()  # Uncomment to visualize
         print(f'detection {detection}')
 
         detections = []
@@ -43,7 +43,7 @@ while ret:
 
         # Detect license plates
         license_plates = license_plate_detector(frame)[0]
-        #license_plates.show()  # Uncomment to visualize
+        license_plates.show()  # Uncomment to visualize
 
         for license_plate in license_plates.boxes.data.tolist():
             print(f'license_plate {license_plate}')
