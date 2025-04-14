@@ -121,8 +121,8 @@ def license_complies_format(text):
     Returns:
         bool: True if the license plate complies with the format, False otherwise.
     """
-    if len(text) != 6:
-        return False
+    #if len(text) != 6:
+        #return False
 ####ETHIOPIAN TARGA NUMBER LNGTH IS 6***************************************************************
     if (text[0] in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'] or text[0] in dict_char_to_int.keys()) and \
        (text[1] in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'] or text[1] in dict_char_to_int.keys()) and \
@@ -133,7 +133,7 @@ def license_complies_format(text):
        #(text[6] in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'] or text[6] in dict_char_to_int.keys()):
         return True
     else:
-        return False
+        return True
 
 
 def format_license(text):
@@ -149,9 +149,11 @@ def format_license(text):
     license_plate_ = ''
     alphabet='ABCDEFGHIJKLMNOPQRSTUVWXYZ'
     
-    for j in range(6):####ETHIOPIAN TARGA NUMBER LNGTH IS 6***************************************************************
+    for j in range(len(text)):####ETHIOPIAN TARGA NUMBER LNGTH IS 6***************************************************************
         if text[j] in alphabet:
-            license_plate_ += dict_char_to_int[text[j]]
+            #license_plate_ += dict_char_to_int[text[j]]
+            license_plate_ += text[j]
+
         else:
             license_plate_ += text[j]
 
