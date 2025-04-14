@@ -17,7 +17,7 @@ frame_queue = queue.Queue(maxsize=3)  # Smaller queue for real-time
 
 # Load video
 cap = cv2.VideoCapture('output/pexels-taryn-elliott-5309381 (1080p).mp4')
-vehicles = [2, 3, 5, 7]  # COCO classes: car, motorcycle, bus, truck
+vehicles = {2:'car',3:'motorcycle',5:'bus',7:'truck'}  # COCO classes: car, motorcycle, bus, truck
 result = {}
 frame_nmr = -1
 
@@ -69,16 +69,16 @@ try:
         for det in detection.boxes.data.tolist():
             x1, y1, x2, y2, score, class_id = det
             if int(class_id) in vehicles:
-                detections.append([x1, y1, x2, y2, score])
+                detections.append([x1, y1, x2, y2, score,class_id])
 
         # Track vehicles
         track_ids = vehicle_tracker.update(np.asarray(detections) if detections else np.empty((0, 5)))
 
         # Draw vehicle boxes and IDs
         for track in track_ids:
-            x1, y1, x2, y2, track_id = map(int, track)
+            x1, y1, x2, y2, track_id,class_id= map(int, track)
             cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)  # Green box
-            cv2.putText(frame, f"ID: {track_id}", (x1, y1-10), 
+            cv2.putText(frame, f"ID: {track_id} Type: {vehicles[class_id]}", (x1, y1-10), 
                         cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
 
         # Detect license plates every 5th frame
