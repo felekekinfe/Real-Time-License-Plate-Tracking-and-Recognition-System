@@ -141,7 +141,7 @@ for frame, vehicles_dict in result.items():
         lp_text_score = info['license_plates']['text_score']
 
 
-        if lp_text_score > 0.6:
+        if lp_text_score > 0.6 and len(lp_text)>6:
             key = (car_id, lp_text)
             if key not in all_instances or lp_score > all_instances[key][2]:
                 all_instances[key] = (frame, info, lp_score)
