@@ -16,7 +16,7 @@ license_plate_detector = YOLO('model/license_plate_detector.pt')
 frame_queue = queue.Queue(maxsize=3)  # Smaller queue for real-time
 
 # Load video
-cap = cv2.VideoCapture('output/Traffic Control CCTV.mp4')
+cap = cv2.VideoCapture('output/pexels-taryn-elliott-5309381 (1080p).mp4')
 vehicles = [2, 3, 5, 7]  # COCO classes: car, motorcycle, bus, truck
 result = {}
 frame_nmr = -1
@@ -138,8 +138,16 @@ for frame, vehicles_dict in result.items():
         lp_text = info['license_plates']['text']
         lp_score = info['license_plates']['bbox_score']
         key = (car_id, lp_text)
-        if key not in all_instances or lp_score > all_instances[key][2]:
-            all_instances[key] = (frame, info, lp_score)
+        lp_text_score = info['license_plates']['text_score']
+
+
+        if lp_text_score > 0.6:
+            key = (car_id, lp_text)
+            if key not in all_instances or lp_score > all_instances[key][2]:
+                all_instances[key] = (frame, info, lp_score)
+
+
+        
 
 filtered_data = []
 for (car_id, lp_text), (frame, info, _) in all_instances.items():
